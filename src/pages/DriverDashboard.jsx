@@ -84,6 +84,7 @@ export default function DriverDashboard() {
   const handleCancelRide = async () => {
     if (activeRide && window.confirm("Are you sure you want to cancel picking up this rider? This will clear the ride from your screen.")) {
       try {
+        alert("Attempting to cancel ride ID: " + activeRide.id);
         await cancelRide(activeRide.id, 'driver');
         alert("Ride payload successfully cancelled. You are back online.");
       } catch (err) {
