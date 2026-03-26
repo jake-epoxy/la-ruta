@@ -190,6 +190,18 @@ export function RideProvider({ children }) {
     }
   }, [activeRide]);
 
+  // Submit a tip
+  const submitTip = useCallback(async (rideId, amount) => {
+    try {
+      await updateDoc(doc(db, 'rides', rideId), {
+        tip: amount
+      });
+    } catch (err) {
+      console.error("Failed to submit tip:", err);
+      throw err;
+    }
+  }, []);
+
   return (
     <RideContext.Provider value={{
       activeRide,
@@ -199,6 +211,7 @@ export function RideProvider({ children }) {
       acceptRide,
       updateRideStatus,
       cancelRide,
+      submitTip,
     }}>
       {children}
     </RideContext.Provider>

@@ -32,7 +32,7 @@ export default function DriverDashboard() {
 
   const todayEarnings = rideHistory
     .filter(r => r.status === 'completed')
-    .reduce((s, r) => s + (r.fare || 0), 0);
+    .reduce((s, r) => s + (r.fare || 0) + (parseFloat(r.tip) || 0), 0);
 
   const todayRides = rideHistory.filter(r => r.status === 'completed').length;
 

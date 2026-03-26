@@ -12,10 +12,12 @@ import './Rider.css';
 
 export default function RiderRideStatus() {
   const navigate = useNavigate();
-  const { activeRide, cancelRide, rideHistory } = useRide();
+  const { activeRide, cancelRide, rideHistory, submitTip } = useRide();
   const { position, startTracking } = useLocation();
   const [driverLocation, setDriverLocation] = useState(null);
   const [focusCoords, setFocusCoords] = useState(null);
+  const [isTipping, setIsTipping] = useState(false);
+  const [customTip, setCustomTip] = useState('');
 
   useEffect(() => { startTracking(); }, []);
 
@@ -65,6 +67,89 @@ export default function RiderRideStatus() {
 
   if (!activeRide) {
     const isCancelled = newestPastRide?.status?.includes('cancel');
+    const isCompleted = newestPastRide?.status === 'completed';
+
+    const handleTip = async (amount) => {
+      if (!newestPastRide || isTipping || amount <= 0) return;
+      setIsTipping(true);
+      try {
+        await submitTip(newestPastRide.id, amount);
+        navigate('/rider');
+      } catch (err) {
+        setIsTipping(false);
+        alert("Failed to submit tip. Please check connection.");
+      }
+    };
+
+    if (isCompleted) {
+      return (
+        <div className="dashboard-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <motion.div 
+            className="glass-card" 
+            initial={{ opacity: 0, scale: 0.8, y: 50 }} 
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
+            style={{ textAlign: 'center', width: '100%', borderColor: 'var(--gold-primary)', boxShadow: '0 8px 32px rgba(255, 215, 64, 0.15)' }}
+          >
+            <div style={{ fontSize: '4rem', marginBottom: '8px' }}>🎉</div>
+            <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--gold-primary)', fontSize: '2rem', marginBottom: '8px' }}>
+              You've Arrived!
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontSize: '1.1rem' }}>
+              Tip <strong>{newestPastRide.driverName || 'your driver'}</strong> to say thanks!
+            </p>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+               {[2, 3, 5, 10].map(amount => (
+                 <motion.button
+                   key={amount}
+                   whileTap={{ scale: 0.9 }}
+                   className="btn"
+                   onClick={() => handleTip(amount)}
+                   disabled={isTipping}
+                   style={{ 
+                     background: 'rgba(255,215,64,0.1)', 
+                     border: '1px solid var(--gold-primary)',
+                     color: 'var(--gold-primary)',
+                     fontSize: '1.5rem',
+                     fontWeight: 700,
+                     padding: '16px'
+                   }}
+                 >
+                   ${amount}
+                 </motion.button>
+               ))}
+            </div>
+
+            <div style={{ marginBottom: '24px', display: 'flex', gap: '8px' }}>
+               <input 
+                 type="number" 
+                 placeholder="Custom amount" 
+                 className="input-field" 
+                 value={customTip} 
+                 onChange={e => setCustomTip(e.target.value)} 
+                 style={{ flex: 1 }} 
+               />
+               <button 
+                 className="btn btn-primary" 
+                 onClick={() => handleTip(parseFloat(customTip) || 0)}
+                 disabled={!customTip || isTipping}
+               >
+                 {isTipping ? '...' : 'Send'}
+               </button>
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: 'var(--green-primary)', fontWeight: 600, marginBottom: '24px' }}>
+              100% of your tip goes instantly to {newestPastRide.driverName || 'the driver'}.
+            </p>
+
+            <Link to="/rider" className="btn btn-secondary" style={{ width: '100%', border: 'none', background: 'transparent' }}>
+              No thanks, return home
+            </Link>
+          </motion.div>
+        </div>
+      );
+    }
 
     return (
       <div className="dashboard-page">
