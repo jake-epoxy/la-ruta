@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Check if the user is the master admin (case-insensitive check)
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email.lower() == "jakeflowers222@gmail.com";
+    }
+
+    // Is the user authenticated natively
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    match /users/{userId} {
+      // READS: 
+      // 1. You can read your own profile
+      // 2. Riders can query for drivers whose `isOnline` is true
+      // 3. Admin can read all users
+      allow read: if isAuth() && (
+        request.auth.uid == userId || 
+        isAdmin() ||
+        (resource.data.role == 'driver' && resource.data.isOnline == true)
+      );
+
+      // WRITES:
+      // You can only create/update your own user document, or Admin can edit any
+      allow write: if isAuth() && (request.auth.uid == userId || isAdmin());
+    }
+
+    match /rides/{rideId} {
+      // READS: 
+      // The current frontend MVP downloads all rides and filters client-side 
+      // to avoid composite indexes. Therefore, we must allow all authenticated users to read.
+      allow read: if isAuth();
+
+      // CREATES (Riders requesting a ride):
+      // Only allowed if the riderId matches the logged in user
+      allow create: if isAuth() && request.resource.data.riderId == request.auth.uid;
+
+      // UPDATES (Drivers accepting rides, completing rides):
+      // Only allowed if the requester is authenticated
+      allow update: if isAuth();
+
+      // DELETES:
+      // Nobody should be deleting ride documents, only updating status to 'cancelled'
+      allow delete: if isAdmin();
+    }
+  }
+}

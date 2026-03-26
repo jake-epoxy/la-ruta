@@ -1,0 +1,124 @@
+.address-input-wrapper {
+  position: relative;
+}
+
+.address-input-container {
+  position: relative;
+}
+
+.address-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.address-input {
+  padding-left: 34px !important;
+  padding-right: 32px !important;
+  width: 100%;
+}
+
+.address-loading {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--green-primary);
+  animation: spin 1s linear infinite;
+}
+
+.address-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.address-clear:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass);
+}
+
+@keyframes spin {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Suggestions Dropdown */
+.address-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-top: 4px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.address-suggestion {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.address-suggestion:last-child {
+  border-bottom: none;
+}
+
+.address-suggestion:hover {
+  background: var(--bg-glass);
+}
+
+.suggestion-icon {
+  color: var(--green-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.suggestion-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.suggestion-main {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.suggestion-full {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

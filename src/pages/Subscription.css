@@ -1,0 +1,141 @@
+/* ===========================
+   SUBSCRIPTION PAGE STYLES
+   =========================== */
+
+.current-plan {
+  margin-bottom: var(--space-xl);
+}
+
+.current-plan:hover {
+  transform: none;
+}
+
+.current-plan-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.plan-name {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.plan-type {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.plan-price {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--green-primary);
+}
+
+.plan-period {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.plan-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.plan-benefit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Plan Options */
+.plan-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.plan-option {
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.plan-active {
+  border-color: var(--green-primary);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.plan-option-badge {
+  position: absolute;
+  top: calc(-1 * var(--space-sm));
+  right: var(--space-lg);
+}
+
+.plan-option-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text-secondary);
+}
+
+.plan-option-header h3 {
+  font-size: 1rem;
+}
+
+.plan-option-price {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.price-amount {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 900;
+}
+
+.price-period {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.plan-option-desc {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.plan-option-savings {
+  width: fit-content;
+}
+
+.plan-option .btn {
+  width: 100%;
+  margin-top: auto;
+}
+
+/* Billing History */
+.billing-history {
+  margin-bottom: var(--space-xl);
+}
+
+.billing-history:hover {
+  transform: none;
+}
+
+.billing-history h3 {
+  margin-bottom: var(--space-lg);
+  font-size: 1.1rem;
+}

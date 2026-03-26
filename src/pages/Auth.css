@@ -1,0 +1,135 @@
+/* ===========================
+   AUTH PAGES STYLES
+   =========================== */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.auth-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  padding: var(--space-2xl);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.auth-logo {
+  display: inline-flex;
+  margin-bottom: var(--space-lg);
+}
+
+.auth-header h1 {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-xs);
+}
+
+.auth-header p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.auth-error {
+  background: var(--red-subtle);
+  color: var(--red-primary);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.input-with-icon .input-field {
+  padding-left: 38px;
+  width: 100%;
+}
+
+/* Role Selector */
+.role-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.role-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--bg-glass);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.role-option:hover {
+  border-color: var(--green-primary);
+  color: var(--text-primary);
+}
+
+.role-option.active {
+  border-color: var(--green-primary);
+  background: var(--green-subtle);
+  color: var(--green-primary);
+}
+
+.auth-note {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border-color);
+}
+
+.auth-footer p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.auth-footer a {
+  font-weight: 600;
+}
