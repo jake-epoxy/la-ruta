@@ -43,6 +43,8 @@ export default function RiderHome() {
     }
   };
 
+  const [vibes, setVibes] = useState([]);
+
   const handleDropoffSelect = (suggestion) => {
     if (suggestion) {
       setDropoffCoords([suggestion.lat, suggestion.lng]);
@@ -139,7 +141,15 @@ export default function RiderHome() {
       }
     }
 
-    await requestRide(finalPickupName, dropoff, pCoords, dCoords, finalFare, selectedTier);
+    await requestRide(
+      finalPickupName, 
+      dropoff, 
+      pCoords, 
+      dCoords, 
+      finalFare, 
+      selectedTier,
+      vibes
+    );
     setRequesting(false);
     navigate('/rider/status');
   };
@@ -261,6 +271,41 @@ export default function RiderHome() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Vibe Check Tags */}
+            <div style={{ marginBottom: '16px' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 500 }}>Pre-Ride Vibe Check (Optional)</p>
+              <div className="vibe-scroll-container" style={{ display: 'flex', overflowX: 'auto', gap: '8px', paddingBottom: '4px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {['🤫 Quiet Ride', '🎶 Aux Cord', '❄️ A/C Full Blast', '🗣️ Talkative', '🐾 Pets Allowed', '☕ Coffee Run', '🍫 Snacks Available'].map(tag => (
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    key={tag}
+                    onClick={() => {
+                      setVibes(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
+                    }}
+                    style={{
+                      whiteSpace: 'nowrap',
+                      background: vibes.includes(tag) ? 'var(--blue-dark)' : 'rgba(255,255,255,0.05)',
+                      color: vibes.includes(tag) ? 'var(--blue-primary)' : 'var(--text-secondary)',
+                      border: `1px solid ${vibes.includes(tag) ? 'var(--blue-primary)' : 'rgba(255,255,255,0.1)'}`,
+                      padding: '8px 16px',
+                      borderRadius: '20px',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                      outline: 'none',
+                    }}
+                  >
+                    {tag}
+                  </motion.button>
+                ))}
+              </div>
+              <style>{`
+                .vibe-scroll-container::-webkit-scrollbar {
+                  display: none;
+                }
+              `}</style>
             </div>
 
             <motion.button

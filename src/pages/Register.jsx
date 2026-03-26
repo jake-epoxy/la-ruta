@@ -15,13 +15,14 @@ export default function Register() {
   const [role, setRole] = useState('driver');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [driverPreferences, setDriverPreferences] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const result = await register(name, email, password, role, phone);
+    const result = await register(name, email, password, role, phone, driverPreferences);
     if (result.success) {
       navigate(role === 'driver' ? '/driver' : '/rider');
     } else {
@@ -138,7 +139,41 @@ export default function Register() {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }} disabled={loading}>
+          {role === 'driver' && (
+            <div className="input-group">
+              <label>Ride Capabilities (Opt-In)</label>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', marginTop: '-4px' }}>
+                Select capabilities to match with riders requesting specific vibes.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {['🤫 Quiet Ride', '🎶 Aux Cord', '❄️ A/C Full Blast', '🗣️ Talkative', '🐾 Pets Allowed', '☕ Coffee Run', '🍫 Snacks Available'].map(tag => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => {
+                      setDriverPreferences(prev => 
+                        prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+                      );
+                    }}
+                    style={{
+                      background: driverPreferences.includes(tag) ? 'rgba(0, 230, 118, 0.2)' : 'rgba(255,255,255,0.05)',
+                      color: driverPreferences.includes(tag) ? 'var(--green-primary)' : 'var(--text-secondary)',
+                      border: `1px solid ${driverPreferences.includes(tag) ? 'var(--green-primary)' : 'rgba(255,255,255,0.1)'}`,
+                      padding: '8px 12px',
+                      borderRadius: '20px',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: '8px' }} disabled={loading}>
             {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={16} />
           </button>
 

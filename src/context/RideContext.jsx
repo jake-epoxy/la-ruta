@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { db } from '../firebase';
 import { useAuth } from './AuthContext';
 import {
-  collection, doc, addDoc, updateDoc, onSnapshot,
+  collection, doc, addDoc, updateDoc, onSnapshot, getDoc,
   query, where, orderBy, limit, serverTimestamp
 } from 'firebase/firestore';
 
@@ -99,7 +99,7 @@ export function RideProvider({ children }) {
   }, [user?.uid, user?.role]);
 
   // Rider: Request a ride
-  const requestRide = useCallback(async (pickup, dropoff, pickupCoords, dropoffCoords, fareEstimate, tier = 'Standard') => {
+  const requestRide = useCallback(async (pickup, dropoff, pickupCoords, dropoffCoords, fareEstimate, tier = 'Standard', vibes = []) => {
     if (!user?.uid) return null;
 
     const rideData = {
@@ -116,6 +116,9 @@ export function RideProvider({ children }) {
       dropoffCoords: { lat: dropoffCoords[0], lng: dropoffCoords[1] },
       fare: fareEstimate,
       tier,
+      vibes,
+      targetDriverIds: user.favoriteDrivers?.length > 0 ? user.favoriteDrivers : null,
+      targetTimeoutExpires: user.favoriteDrivers?.length > 0 ? Date.now() + 30000 : null,
       status: 'requested',
       createdAt: serverTimestamp(),
       acceptedAt: null,
@@ -123,6 +126,24 @@ export function RideProvider({ children }) {
     };
 
     const docRef = await addDoc(collection(db, 'rides'), rideData);
+    
+    if (rideData.targetDriverIds) {
+      setTimeout(async () => {
+        try {
+          const rideSnap = await getDoc(docRef);
+          if (rideSnap.exists() && rideSnap.data().status === 'requested') {
+            await updateDoc(docRef, {
+              targetDriverIds: null,
+              targetTimeoutExpires: null
+            });
+            console.log("30s Favorite Driver lock expired — Ride is now available to the public pool.");
+          }
+        } catch (e) {
+          console.error("Failed to release ride to public pool:", e);
+        }
+      }, 30000);
+    }
+
     return docRef.id;
   }, [user]);
 

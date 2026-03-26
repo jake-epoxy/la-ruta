@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  const register = async (name, email, password, role, phone) => {
+  const register = async (name, email, password, role, phone, driverPreferences = []) => {
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(cred.user, { displayName: name });
@@ -52,6 +52,10 @@ export function AuthProvider({ children }) {
         isOnline: false,
         location: null,
       };
+
+      if (role === 'driver') {
+        userData.driverPreferences = driverPreferences;
+      }
 
       await setDoc(doc(db, 'users', cred.user.uid), userData);
       setUser({ uid: cred.user.uid, ...userData });

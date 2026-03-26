@@ -1,14 +1,30 @@
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 import { useRide } from '../context/RideContext';
-import { Clock, MapPin, DollarSign, Star } from 'lucide-react';
+import { Clock, MapPin, DollarSign, Star, Heart } from 'lucide-react';
 import './Dashboard.css';
 import './Rider.css';
 
 export default function RiderHistory() {
+  const { user, updateUser } = useAuth();
   const { rideHistory } = useRide();
 
   const completedRides = rideHistory.filter(r => r.status === 'completed');
   const totalSpent = completedRides.reduce((s, r) => s + (r.fare || 0), 0);
+
+  const favoriteDrivers = user?.favoriteDrivers || [];
+
+  const toggleFavorite = async (driverId) => {
+    if (!driverId) return;
+    const isFav = favoriteDrivers.includes(driverId);
+    let newFavs;
+    if (isFav) {
+      newFavs = favoriteDrivers.filter(id => id !== driverId);
+    } else {
+      newFavs = [...favoriteDrivers, driverId];
+    }
+    await updateUser({ favoriteDrivers: newFavs });
+  };
 
   return (
     <div className="dashboard-page">
@@ -87,7 +103,31 @@ export default function RiderHistory() {
                     ))}
                   </span>
                 </div>
-                <span className="badge badge-green">Completed</span>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {ride.driverId && (
+                    <motion.button 
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => toggleFavorite(ride.driverId)}
+                      className="btn btn-sm"
+                      style={{
+                        background: favoriteDrivers.includes(ride.driverId) ? 'var(--gold-primary)' : 'rgba(255,255,255,0.05)',
+                        color: favoriteDrivers.includes(ride.driverId) ? '#111' : 'var(--text-secondary)',
+                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontWeight: 600,
+                        border: 'none',
+                        borderRadius: '20px'
+                      }}
+                    >
+                      <Heart size={12} fill={favoriteDrivers.includes(ride.driverId) ? '#111' : 'none'} />
+                      {favoriteDrivers.includes(ride.driverId) ? 'Favorited' : 'Favorite'}
+                    </motion.button>
+                  )}
+                  <span className="badge badge-green">Completed</span>
+                </div>
               </div>
             </motion.div>
           ))}

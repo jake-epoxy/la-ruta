@@ -87,6 +87,12 @@ export default function DriverDashboard() {
     }
   };
 
+  const driverPrefs = user?.driverPreferences || [];
+  const compatibleRides = availableRides.filter(ride => {
+    if (!ride.vibes || ride.vibes.length === 0) return true;
+    return ride.vibes.every(vibe => driverPrefs.includes(vibe));
+  });
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-header">
@@ -263,14 +269,14 @@ export default function DriverDashboard() {
       </AnimatePresence>
 
       {/* Incoming Ride Requests */}
-      {isOnline && !activeRide && availableRides.length > 0 && (
+      {isOnline && !activeRide && compatibleRides.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           style={{ marginBottom: 'var(--space-xl)' }}
         >
           <h3 style={{ marginBottom: 'var(--space-md)' }}>📥 Incoming Ride Requests</h3>
-          {availableRides.map(ride => (
+          {compatibleRides.map(ride => (
             <div key={ride.id} className="glass-card" style={{ marginBottom: 'var(--space-sm)', borderColor: 'var(--gold-primary)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
                 <div>
@@ -292,6 +298,24 @@ export default function DriverDashboard() {
                   <span className="ride-to">{ride.dropoff}</span>
                 </div>
               </div>
+              
+              {ride.vibes && ride.vibes.length > 0 && (
+                <div style={{ marginBottom: '16px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {ride.vibes.map(vibe => (
+                    <span key={vibe} style={{ 
+                      fontSize: '0.75rem', 
+                      padding: '4px 8px', 
+                      borderRadius: '12px', 
+                      background: 'rgba(0, 230, 118, 0.1)', 
+                      color: 'var(--green-primary)',
+                      border: '1px solid rgba(0, 230, 118, 0.2)'
+                    }}>
+                      {vibe}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <button className="btn btn-primary" onClick={() => handleAcceptRide(ride.id)} style={{ width: '100%' }}>
                 <Check size={16} /> Accept Ride
               </button>
@@ -300,7 +324,7 @@ export default function DriverDashboard() {
         </motion.div>
       )}
 
-      {isOnline && !activeRide && availableRides.length === 0 && (
+      {isOnline && !activeRide && compatibleRides.length === 0 && (
         <motion.div
           className="glass-card"
           initial={{ opacity: 0 }}
