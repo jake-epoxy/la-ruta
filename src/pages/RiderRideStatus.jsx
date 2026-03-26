@@ -12,7 +12,7 @@ import './Rider.css';
 
 export default function RiderRideStatus() {
   const navigate = useNavigate();
-  const { activeRide, cancelRide } = useRide();
+  const { activeRide, cancelRide, rideHistory } = useRide();
   const { position, startTracking } = useLocation();
   const [driverLocation, setDriverLocation] = useState(null);
   const [focusCoords, setFocusCoords] = useState(null);
@@ -61,15 +61,28 @@ export default function RiderRideStatus() {
     setTimeout(() => setFocusCoords(null), 4000); // Resume tracking after 4 seconds
   };
 
+  const newestPastRide = rideHistory && rideHistory.length > 0 ? rideHistory[0] : null;
+
   if (!activeRide) {
+    const isCancelled = newestPastRide?.status?.includes('cancel');
+
     return (
       <div className="dashboard-page">
-        <motion.div className="glass-card ride-complete-card" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-          <div className="ride-complete-icon">✅</div>
-          <h2>Ride Complete!</h2>
-          <p className="text-secondary">Thanks for riding with La Ruta</p>
-          <Link to="/rider" className="btn btn-primary" style={{ marginTop: 'var(--space-lg)' }}>
-            Request Another Ride <ArrowRight size={16} />
+        <motion.div 
+          className="glass-card ride-complete-card" 
+          initial={{ opacity: 0, scale: 0.9 }} 
+          animate={{ opacity: 1, scale: 1 }}
+          style={{ borderColor: isCancelled ? 'var(--red-primary)' : 'var(--green-primary)' }}
+        >
+          <div className="ride-complete-icon">{isCancelled ? '❌' : '✅'}</div>
+          <h2 style={{ color: isCancelled ? 'var(--red-primary)' : 'inherit' }}>
+            {isCancelled ? 'Ride Cancelled' : 'Ride Complete!'}
+          </h2>
+          <p className="text-secondary">
+            {isCancelled ? 'This ride was cancelled.' : 'Thanks for riding with La Ruta'}
+          </p>
+          <Link to="/rider" className="btn btn-primary" style={{ marginTop: 'var(--space-lg)', background: isCancelled ? 'var(--red-primary)' : 'var(--green-primary)' }}>
+            {isCancelled ? 'Return Home' : 'Request Another Ride'} <ArrowRight size={16} />
           </Link>
         </motion.div>
       </div>

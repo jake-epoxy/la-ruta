@@ -12,7 +12,7 @@ import './Dashboard.css';
 
 export default function DriverDashboard() {
   const { user, updateUser } = useAuth();
-  const { activeRide, availableRides, rideHistory, acceptRide, updateRideStatus } = useRide();
+  const { activeRide, availableRides, rideHistory, acceptRide, cancelRide, updateRideStatus } = useRide();
   const { position, startTracking, stopTracking, isTracking, locationError, setManualPosition } = useLocation();
   const [isOnline, setIsOnline] = useState(user?.isOnline || false);
   const [manualAddress, setManualAddress] = useState('');
