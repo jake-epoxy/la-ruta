@@ -173,14 +173,22 @@ export function RideProvider({ children }) {
 
   // Cancel a ride
   const cancelRide = useCallback(async (rideId, actor = 'rider') => {
-    // actor can be 'rider' or 'driver'
-    const statusStr = actor === 'driver' ? 'cancelled_by_driver' : 'cancelled_by_rider';
-    
-    await updateDoc(doc(db, 'rides', rideId), {
-      status: statusStr,
-      completedAt: serverTimestamp(),
-    });
-  }, []);
+    try {
+      // Optimistic UI: clear immediately to bypass network lag
+      if (activeRide && activeRide.id === rideId) {
+        setActiveRide(null);
+      }
+
+      const statusStr = actor === 'driver' ? 'cancelled_by_driver' : 'cancelled_by_rider';
+      await updateDoc(doc(db, 'rides', rideId), {
+        status: statusStr,
+        completedAt: serverTimestamp(),
+      });
+    } catch (err) {
+      console.error("Firebase cancel payload failed:", err);
+      throw err;
+    }
+  }, [activeRide]);
 
   return (
     <RideContext.Provider value={{

@@ -83,7 +83,13 @@ export default function DriverDashboard() {
 
   const handleCancelRide = async () => {
     if (activeRide && window.confirm("Are you sure you want to cancel picking up this rider? This will clear the ride from your screen.")) {
-      await cancelRide(activeRide.id, 'driver');
+      try {
+        await cancelRide(activeRide.id, 'driver');
+        alert("Ride payload successfully cancelled. You are back online.");
+      } catch (err) {
+        alert("System Error: Failed to drop ride payload. Please verify your connection.");
+        console.error(err);
+      }
     }
   };
 
