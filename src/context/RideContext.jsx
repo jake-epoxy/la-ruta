@@ -32,9 +32,10 @@ export function RideProvider({ children }) {
 
       if (user.role === 'rider') {
         // Rider's active ride
-        const myActive = allRides.find(r =>
-          r.riderId === user.uid && activeStatuses.includes(r.status)
-        );
+        const myActiveRides = allRides
+          .filter(r => r.riderId === user.uid && activeStatuses.includes(r.status))
+          .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+        const myActive = myActiveRides.length > 0 ? myActiveRides[0] : null;
         
         // Alert rider if their driver cancelled
         if (!myActive && activeRide && activeRide.driverId) {
@@ -59,9 +60,10 @@ export function RideProvider({ children }) {
 
       if (user.role === 'driver') {
         // Driver's active ride
-        const myActive = allRides.find(r =>
-          r.driverId === user.uid && activeStatuses.includes(r.status)
-        );
+        const myActiveRides = allRides
+          .filter(r => r.driverId === user.uid && activeStatuses.includes(r.status))
+          .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+        const myActive = myActiveRides.length > 0 ? myActiveRides[0] : null;
 
         // Alert driver if their accepted rider cancelled
         if (!myActive && activeRide && activeRide.status !== 'requested') {
