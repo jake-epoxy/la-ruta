@@ -238,7 +238,12 @@ export default function RiderHome() {
             transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
             style={{ marginTop: 'var(--space-md)' }}
           >
-            <h3 style={{ marginBottom: 'var(--space-sm)', fontSize: '1.1rem' }}>Choose a Ride</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-sm)' }}>
+              <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Choose a Ride</h3>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                {fareEstimates.distance.toFixed(1)} mi • {Math.round(fareEstimates.distance * 2.2)} min drive
+              </span>
+            </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: 'var(--space-md)' }}>
               {fareEstimates.tiers.map((tier) => (
