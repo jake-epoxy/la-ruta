@@ -265,6 +265,34 @@ export function RideProvider({ children }) {
       }, 30000);
     }
 
+    // 🔔 SMS Notify offline drivers (fire & forget — don't block ride creation)
+    try {
+      const driversSnap = await import('firebase/firestore').then(({ getDocs, query: q, where: w }) =>
+        getDocs(q(collection(db, 'users'), w('role', '==', 'driver')))
+      );
+      const offlineDriverPhones = [];
+      driversSnap.forEach(d => {
+        const data = d.data();
+        if (!data.isOnline && data.phone && d.id !== user.uid) {
+          offlineDriverPhones.push(data.phone);
+        }
+      });
+
+      if (offlineDriverPhones.length > 0) {
+        fetch('/api/notify-drivers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pickup: pickup,
+            fare: fareEstimate,
+            driverPhones: offlineDriverPhones,
+          }),
+        }).catch(e => console.log('SMS notification failed (non-blocking):', e));
+      }
+    } catch (e) {
+      console.log('SMS driver notification skipped:', e);
+    }
+
     return docRef.id;
   }, [user]);
 
