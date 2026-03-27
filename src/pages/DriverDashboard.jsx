@@ -133,6 +133,35 @@ export default function DriverDashboard() {
     return ride.vibes.every(vibe => driverPrefs.includes(vibe));
   });
 
+  // Profile completeness check
+  const missingFields = [];
+  if (!user?.phone) missingFields.push('Phone Number');
+  if (!user?.email) missingFields.push('Email');
+  if (!user?.address) missingFields.push('Home Address');
+  const profileComplete = missingFields.length === 0;
+  const [showPhoneInput, setShowPhoneInput] = useState(false);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [addressInput, setAddressInput] = useState('');
+  const [showAddressInput, setShowAddressInput] = useState(false);
+
+  const handleSavePhone = async () => {
+    if (!phoneInput.trim()) return;
+    // Normalize: add +1 if not present
+    let normalized = phoneInput.replace(/\D/g, '');
+    if (normalized.length === 10) normalized = '1' + normalized;
+    if (!normalized.startsWith('+')) normalized = '+' + normalized;
+    await updateUser({ phone: normalized });
+    setShowPhoneInput(false);
+    setPhoneInput('');
+  };
+
+  const handleSaveAddress = async () => {
+    if (!addressInput.trim()) return;
+    await updateUser({ address: addressInput.trim() });
+    setShowAddressInput(false);
+    setAddressInput('');
+  };
+
   return (
     <div className="dashboard-page">
       {/* Emergency SOS — visible during active rides */}
@@ -161,6 +190,85 @@ export default function DriverDashboard() {
           <div className={`toggle-dot ${isOnline ? 'active' : ''}`} />
         </button>
       </div>
+
+      {/* Profile Completeness Banner */}
+      {!profileComplete && (
+        <motion.div
+          className="glass-card"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            marginBottom: 'var(--space-xl)',
+            borderColor: 'var(--gold-primary)',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            background: 'rgba(212, 175, 55, 0.08)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: 'var(--space-sm)' }}>
+            <span style={{ fontSize: '1.3rem' }}>⚠️</span>
+            <h3 style={{ margin: 0, color: 'var(--gold-primary)' }}>Complete Your Profile</h3>
+          </div>
+          <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 'var(--space-md)' }}>
+            You're missing: {missingFields.map((f, i) => (
+              <span key={f} style={{ color: 'var(--gold-primary)', fontWeight: 600 }}>
+                {f}{i < missingFields.length - 1 ? ', ' : ''}
+              </span>
+            ))}
+            {missingFields.includes('Phone Number') && (
+              <span> — without a phone number, you won't receive ride alerts via text!</span>
+            )}
+          </p>
+
+          {/* Quick Phone Input */}
+          {missingFields.includes('Phone Number') && !showPhoneInput && (
+            <button
+              className="btn btn-gold btn-sm"
+              onClick={() => setShowPhoneInput(true)}
+              style={{ marginRight: 'var(--space-sm)', marginBottom: '8px' }}
+            >
+              <Phone size={14} /> Add Phone Number
+            </button>
+          )}
+          {showPhoneInput && (
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+              <input
+                type="tel"
+                placeholder="(915) 555-1234"
+                value={phoneInput}
+                onChange={e => setPhoneInput(e.target.value)}
+                className="input"
+                style={{ flex: 1 }}
+              />
+              <button className="btn btn-gold btn-sm" onClick={handleSavePhone}>Save</button>
+            </div>
+          )}
+
+          {/* Quick Address Input */}
+          {missingFields.includes('Home Address') && !showAddressInput && (
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => setShowAddressInput(true)}
+              style={{ marginBottom: '8px' }}
+            >
+              <MapPin size={14} /> Add Address
+            </button>
+          )}
+          {showAddressInput && (
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+              <input
+                type="text"
+                placeholder="123 Main St, El Paso, TX"
+                value={addressInput}
+                onChange={e => setAddressInput(e.target.value)}
+                className="input"
+                style={{ flex: 1 }}
+              />
+              <button className="btn btn-secondary btn-sm" onClick={handleSaveAddress}>Save</button>
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {isOnline && (
         <motion.div
