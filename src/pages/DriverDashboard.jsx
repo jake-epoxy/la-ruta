@@ -13,11 +13,12 @@ import './Dashboard.css';
 
 export default function DriverDashboard() {
   const { user, updateUser } = useAuth();
-  const { activeRide, availableRides, rideHistory, acceptRide, cancelRide, updateRideStatus } = useRide();
+  const { activeRide, availableRides, rideHistory, acceptRide, cancelRide, updateRideStatus, nearbyRides, queueRide } = useRide();
   const { position, startTracking, stopTracking, isTracking, locationError, setManualPosition } = useLocation();
   const [isOnline, setIsOnline] = useState(user?.isOnline || false);
   const [manualAddress, setManualAddress] = useState('');
   const [settingManual, setSettingManual] = useState(false);
+  const [queuedRideId, setQueuedRideId] = useState(null);
 
   // Auto-start GPS if driver was already online (e.g. page refresh)
   useEffect(() => {
@@ -79,6 +80,25 @@ export default function DriverDashboard() {
   const handleUpdateStatus = async (status) => {
     if (activeRide) {
       await updateRideStatus(activeRide.id, status);
+      // When completing a ride, auto-accept the queued ride
+      if (status === 'completed' && queuedRideId) {
+        try {
+          await acceptRide(queuedRideId);
+          setQueuedRideId(null);
+        } catch (e) {
+          console.error('Failed to auto-accept queued ride:', e);
+          setQueuedRideId(null);
+        }
+      }
+    }
+  };
+
+  const handleQueueRide = async (rideId) => {
+    try {
+      await queueRide(rideId);
+      setQueuedRideId(rideId);
+    } catch (e) {
+      console.error('Failed to queue ride:', e);
     }
   };
 
@@ -277,6 +297,75 @@ export default function DriverDashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Stacked Ride — Next Ride Nearby */}
+      <AnimatePresence>
+        {activeRide && ['inprogress', 'arriving'].includes(activeRide.status) && nearbyRides.length > 0 && !queuedRideId && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{ marginBottom: 'var(--space-xl)' }}
+          >
+            <h3 style={{ marginBottom: 'var(--space-sm)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              🔥 Next Ride Nearby
+              <span className="badge badge-gold" style={{ fontSize: '0.7rem' }}>STACK</span>
+            </h3>
+            {nearbyRides.slice(0, 2).map(ride => (
+              <div key={ride.id} className="glass-card" style={{ marginBottom: 'var(--space-sm)', borderColor: 'var(--gold-primary)', borderStyle: 'dashed' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-sm)' }}>
+                  <div>
+                    <span style={{ display: 'block' }}><User size={14} /> {ride.riderName}</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', fontWeight: 600 }}>
+                      📍 {ride.distanceFromDropoff.toFixed(1)} mi from your drop-off
+                    </span>
+                  </div>
+                  <span className="text-green" style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.25rem' }}>
+                    ${(ride.fare || 0).toFixed(2)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
+                  <div className="ride-points">
+                    <div className="ride-point ride-point-start" />
+                    <div className="ride-line" />
+                    <div className="ride-point ride-point-end" />
+                  </div>
+                  <div className="ride-addresses">
+                    <span className="ride-from">{ride.pickup}</span>
+                    <span className="ride-to">{ride.dropoff}</span>
+                  </div>
+                </div>
+                <button className="btn btn-gold" onClick={() => handleQueueRide(ride.id)} style={{ width: '100%' }}>
+                  <Check size={16} /> Queue This Ride
+                </button>
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Queued Ride Confirmation */}
+      {queuedRideId && activeRide && (
+        <motion.div
+          className="glass-card"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{ marginBottom: 'var(--space-xl)', borderColor: 'var(--gold-primary)', textAlign: 'center', padding: 'var(--space-lg)' }}
+        >
+          <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>🔗</div>
+          <h3 style={{ color: 'var(--gold-primary)' }}>Ride Queued!</h3>
+          <p className="text-secondary" style={{ fontSize: '0.85rem', marginTop: '4px' }}>
+            Will auto-accept after you complete the current drop-off.
+          </p>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => setQueuedRideId(null)}
+            style={{ marginTop: 'var(--space-md)', color: '#ff5252', borderColor: 'rgba(255,82,82,0.3)' }}
+          >
+            Remove from Queue
+          </button>
+        </motion.div>
+      )}
 
       {/* Incoming Ride Requests */}
       {isOnline && !activeRide && compatibleRides.length > 0 && (

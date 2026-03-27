@@ -44,6 +44,7 @@ export default function RiderRideStatus() {
 
   const statusConfig = {
     requested: { text: 'Finding your driver...', sub: 'Matching you with a nearby driver', color: 'var(--gold-primary)', emoji: '🔍', step: 1 },
+    queued: { text: 'Driver finishing nearby drop-off', sub: 'A driver close by has queued your ride — they\'ll be with you shortly!', color: 'var(--gold-primary)', emoji: '🔗', step: 1 },
     accepted: { text: 'Driver is on the way!', sub: 'Your driver accepted and is headed to you', color: 'var(--green-primary)', emoji: '🚗', step: 2 },
     arriving: { text: 'Driver is arriving!', sub: 'Your driver is almost at the pickup point', color: 'var(--green-primary)', emoji: '📍', step: 3 },
     inprogress: { text: 'Ride in progress', sub: 'Sit back and enjoy the ride', color: 'var(--green-primary)', emoji: '🛣️', step: 4 },

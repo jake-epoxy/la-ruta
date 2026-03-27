@@ -14,6 +14,18 @@ export function RideProvider({ children }) {
   const [availableRides, setAvailableRides] = useState([]);
   const [rideHistory, setRideHistory] = useState([]);
   const [scheduledRides, setScheduledRides] = useState([]);
+  const [nearbyRides, setNearbyRides] = useState([]);
+
+  // Haversine distance (miles)
+  const getDistance = (lat1, lng1, lat2, lng2) => {
+    const R = 3959;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
 
   // Listen to ALL active rides and filter client-side
   // (avoids needing Firestore composite indexes)
@@ -28,7 +40,7 @@ export function RideProvider({ children }) {
     const unsub = onSnapshot(collection(db, 'rides'), (snap) => {
       const allRides = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      const activeStatuses = ['requested', 'accepted', 'arriving', 'inprogress'];
+      const activeStatuses = ['requested', 'queued', 'accepted', 'arriving', 'inprogress'];
       const doneStatuses = ['completed', 'cancelled', 'cancelled_by_rider', 'cancelled_by_driver'];
 
       if (user.role === 'rider') {
@@ -309,17 +321,63 @@ export function RideProvider({ children }) {
     }
   }, []);
 
+  // ============================================================
+  // STACKED RIDES — Compute nearby pickups from driver's drop-off
+  // ============================================================
+  useEffect(() => {
+    if (!user || user.role !== 'driver' || !activeRide || !activeRide.dropoffCoords) {
+      setNearbyRides([]);
+      return;
+    }
+
+    // Only show nearby rides during inprogress or arriving status
+    if (!['inprogress', 'arriving'].includes(activeRide.status)) {
+      setNearbyRides([]);
+      return;
+    }
+
+    const dropLat = activeRide.dropoffCoords.lat;
+    const dropLng = activeRide.dropoffCoords.lng;
+    const NEARBY_RADIUS_MILES = 2;
+
+    const nearby = availableRides
+      .filter(r => {
+        if (!r.pickupCoords) return false;
+        const dist = getDistance(dropLat, dropLng, r.pickupCoords.lat, r.pickupCoords.lng);
+        return dist <= NEARBY_RADIUS_MILES;
+      })
+      .map(r => ({
+        ...r,
+        distanceFromDropoff: getDistance(dropLat, dropLng, r.pickupCoords.lat, r.pickupCoords.lng),
+      }))
+      .sort((a, b) => a.distanceFromDropoff - b.distanceFromDropoff);
+
+    setNearbyRides(nearby);
+  }, [user?.role, activeRide?.id, activeRide?.status, activeRide?.dropoffCoords, availableRides]);
+
+  // Driver: Queue (pre-accept) a ride for after current drop-off
+  const queueRide = useCallback(async (rideId) => {
+    if (!user?.uid) return;
+    await updateDoc(doc(db, 'rides', rideId), {
+      queuedByDriverId: user.uid,
+      queuedByDriverName: user.name,
+      status: 'queued',
+    });
+  }, [user]);
+
   return (
     <RideContext.Provider value={{
       activeRide,
       availableRides,
       rideHistory,
       scheduledRides,
+      nearbyRides,
       requestRide,
       acceptRide,
       updateRideStatus,
       cancelRide,
       submitTip,
+      queueRide,
       createScheduledRide,
       acceptScheduledRide,
       declineScheduledRide,
