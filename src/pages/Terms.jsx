@@ -24,6 +24,12 @@ export default function Terms() {
 
         <h3 style={{ marginTop: '24px', color: 'var(--gold-primary)' }}>5. Background & Vetting Waiver</h3>
         <p>During the Alpha phase, La Ruta does not currently execute comprehensive criminal background checks or motor vehicle record checks. Riders enter vehicles strictly at their own risk. Drivers pick up passengers strictly at their own risk.</p>
+
+        <h3 style={{ marginTop: '24px', color: 'var(--gold-primary)' }}>6. SMS Communications & Consent</h3>
+        <p>By registering an account and providing your mobile phone number, you explicitly consent to receive automated SMS text messages from La Ruta regarding ride requests, account updates, and platform notifications. Message frequency varies based on your activity as a driver or rider. Message and data rates may apply. You can reply STOP to unsubscribe at any time.</p>
+
+        <h3 style={{ marginTop: '24px', color: 'var(--gold-primary)' }}>7. Privacy & Data Handling</h3>
+        <p>La Ruta collects personal information (such as name, email, and phone number) solely for the purpose of facilitating ride-share connections and account management. <strong>No mobile information will be shared with third parties or affiliates for marketing or promotional purposes.</strong> All the above categories exclude text messaging originator opt-in data and consent; this information will not be shared with any third parties.</p>
         
         <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '32px 0' }}/>
         

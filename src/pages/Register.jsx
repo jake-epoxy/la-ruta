@@ -203,7 +203,7 @@ export default function Register() {
               style={{ marginTop: '4px', width: '18px', height: '18px', accentColor: 'var(--green-primary)' }}
             />
             <label htmlFor="terms" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-              I agree to the <Link to="/terms" target="_blank" style={{ color: 'var(--gold-primary)' }}>Terms of Service</Link> and acknowledge La Ruta is an Alpha software. I understand La Ruta is a SaaS platform connecting independent contractors, not a transportation company.
+              I agree to the <Link to="/terms" target="_blank" style={{ color: 'var(--gold-primary)' }}>Terms of Service</Link> and acknowledge La Ruta is an Alpha software. I consent to receive SMS notifications regarding ride requests and platform updates. I understand La Ruta is a SaaS platform connecting independent contractors, not a transportation company.
             </label>
           </div>
 

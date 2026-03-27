@@ -16,12 +16,12 @@ service cloud.firestore {
     match /users/{userId} {
       // READS: 
       // 1. You can read your own profile
-      // 2. Riders can query for drivers whose `isOnline` is true
+      // 2. Authenticated users can read any driver profile (needed for SMS to offline drivers)
       // 3. Admin can read all users
       allow read: if isAuth() && (
         request.auth.uid == userId || 
         isAdmin() ||
-        (resource.data.role == 'driver' && resource.data.isOnline == true)
+        resource.data.role == 'driver'
       );
 
       // WRITES:
