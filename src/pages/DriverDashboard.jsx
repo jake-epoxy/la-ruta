@@ -326,6 +326,52 @@ export default function DriverDashboard() {
         </motion.div>
       )}
 
+      {/* Long Distance Toggle — visible when online */}
+      {isOnline && (
+        <motion.div
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ marginBottom: 'var(--space-md)' }}
+        >
+          <button
+            onClick={async () => {
+              const newVal = !user?.longDistanceEnabled;
+              await updateUser({ longDistanceEnabled: newVal });
+            }}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '12px 16px',
+              borderRadius: 'var(--radius-md)',
+              background: user?.longDistanceEnabled ? 'rgba(0, 230, 118, 0.08)' : 'rgba(255,255,255,0.03)',
+              border: `1px solid ${user?.longDistanceEnabled ? 'var(--green-primary)' : 'rgba(255,255,255,0.08)'}`,
+              color: user?.longDistanceEnabled ? 'var(--green-primary)' : 'var(--text-secondary)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+            }}
+          >
+            <span style={{ fontSize: '1.2rem' }}>🛣️</span>
+            <span style={{ flex: 1, textAlign: 'left' }}>Long Distance Mode</span>
+            <div style={{
+              width: '42px', height: '24px', borderRadius: '12px',
+              background: user?.longDistanceEnabled ? 'var(--green-primary)' : 'rgba(255,255,255,0.15)',
+              position: 'relative', transition: 'background 0.2s ease',
+            }}>
+              <div style={{
+                width: '18px', height: '18px', borderRadius: '50%', background: '#fff',
+                position: 'absolute', top: '3px',
+                left: user?.longDistanceEnabled ? '21px' : '3px',
+                transition: 'left 0.2s ease',
+              }} />
+            </div>
+          </button>
+        </motion.div>
+      )}
+
       {/* Map */}
       {isOnline && (
         <motion.div

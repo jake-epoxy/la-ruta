@@ -16,6 +16,7 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [driverPreferences, setDriverPreferences] = useState([]);
+  const [longDistance, setLongDistance] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -23,7 +24,7 @@ export default function Register() {
     setError('');
     setLoading(true);
 
-    const result = await register(name, email, password, role, phone, driverPreferences);
+    const result = await register(name, email, password, role, phone, driverPreferences, longDistance);
     if (result.success) {
       navigate(role === 'driver' ? '/driver' : '/rider');
     } else {
@@ -141,37 +142,56 @@ export default function Register() {
           </div>
 
           {role === 'driver' && (
-            <div className="input-group">
-              <label>Ride Capabilities (Opt-In)</label>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', marginTop: '-4px' }}>
-                Select capabilities to match with riders requesting specific vibes.
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {['🤫 Quiet Ride', '🎶 Aux Cord', '❄️ A/C Full Blast', '🗣️ Talkative', '🐾 Pets Allowed', '☕ Coffee Run', '🍫 Snacks Available'].map(tag => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => {
-                      setDriverPreferences(prev => 
-                        prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-                      );
-                    }}
-                    style={{
-                      background: driverPreferences.includes(tag) ? 'rgba(0, 230, 118, 0.2)' : 'rgba(255,255,255,0.05)',
-                      color: driverPreferences.includes(tag) ? 'var(--green-primary)' : 'var(--text-secondary)',
-                      border: `1px solid ${driverPreferences.includes(tag) ? 'var(--green-primary)' : 'rgba(255,255,255,0.1)'}`,
-                      padding: '8px 12px',
-                      borderRadius: '20px',
-                      fontSize: '0.85rem',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    {tag}
-                  </button>
-                ))}
+            <>
+              <div className="input-group">
+                <label>Ride Capabilities (Opt-In)</label>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px', marginTop: '-4px' }}>
+                  Select capabilities to match with riders requesting specific vibes.
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {['🤫 Quiet Ride', '🎶 Aux Cord', '❄️ A/C Full Blast', '🗣️ Talkative', '🐾 Pets Allowed', '☕ Coffee Run', '🍫 Snacks Available'].map(tag => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => {
+                        setDriverPreferences(prev => 
+                          prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+                        );
+                      }}
+                      style={{
+                        background: driverPreferences.includes(tag) ? 'rgba(0, 230, 118, 0.2)' : 'rgba(255,255,255,0.05)',
+                        color: driverPreferences.includes(tag) ? 'var(--green-primary)' : 'var(--text-secondary)',
+                        border: `1px solid ${driverPreferences.includes(tag) ? 'var(--green-primary)' : 'rgba(255,255,255,0.1)'}`,
+                        padding: '8px 12px',
+                        borderRadius: '20px',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+
+              {/* Long Distance Option */}
+              <div style={{ marginTop: '16px', display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '12px', borderRadius: 'var(--radius-md)', background: longDistance ? 'rgba(0, 230, 118, 0.05)' : 'rgba(255,255,255,0.02)', border: `1px solid ${longDistance ? 'var(--green-primary)' : 'rgba(255,255,255,0.08)'}`, cursor: 'pointer', transition: 'all 0.2s ease' }} onClick={() => setLongDistance(!longDistance)}>
+                <input
+                  type="checkbox"
+                  checked={longDistance}
+                  onChange={(e) => setLongDistance(e.target.checked)}
+                  style={{ marginTop: '2px', width: '18px', height: '18px', accentColor: 'var(--green-primary)', cursor: 'pointer' }}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <div>
+                  <span style={{ fontWeight: 600, fontSize: '0.95rem', color: longDistance ? 'var(--green-primary)' : 'var(--text-primary)' }}>🛣️ Long Distance Drives</span>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', lineHeight: '1.4' }}>
+                    I'm willing to drive out of town or out of state (e.g. El Paso → Las Cruces, Juárez, Albuquerque). Higher fares, longer trips.
+                  </p>
+                </div>
+              </div>
+            </>
           )}
 
           <div className="input-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '12px', marginTop: '16px' }}>
