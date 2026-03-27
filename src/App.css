@@ -496,5 +496,12 @@ input, textarea, select {
   .bottom-nav-item:hover {
     color: var(--text-primary);
   }
+
+  .bottom-nav-switch {
+    color: var(--gold-primary) !important;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
 }
 

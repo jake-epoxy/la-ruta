@@ -4,6 +4,7 @@ import { useRide } from '../context/RideContext';
 import { useLocation } from '../context/LocationContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import Map from '../components/Map';
+import EmergencySOS from '../components/EmergencySOS';
 import {
   DollarSign, TrendingUp, Car, Star, Power, MapPin, Clock, Navigation,
   Check, X as XIcon, User, Phone, MessageSquare
@@ -102,6 +103,8 @@ export default function DriverDashboard() {
 
   return (
     <div className="dashboard-page">
+      {/* Emergency SOS — visible during active rides */}
+      {activeRide && <EmergencySOS />}
       <div className="dashboard-header">
         <div>
           <h1>Driver Dashboard</h1>

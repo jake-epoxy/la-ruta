@@ -4,6 +4,7 @@ import { useRide } from '../context/RideContext';
 import { useLocation } from '../context/LocationContext';
 import { motion } from 'framer-motion';
 import Map from '../components/Map';
+import EmergencySOS from '../components/EmergencySOS';
 import { Navigation, Phone, MessageSquare, MapPin, ArrowRight } from 'lucide-react';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -176,6 +177,8 @@ export default function RiderRideStatus() {
 
   return (
     <div className="ride-status-page">
+      {/* Emergency SOS */}
+      <EmergencySOS />
       {/* Full-width map */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="ride-status-map">
         <Map

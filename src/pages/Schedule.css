@@ -1,0 +1,235 @@
+/* ===========================
+   Schedule Pages — Shared Styles
+   =========================== */
+
+/* --- Schedule Card --- */
+.schedule-card {
+  margin-bottom: var(--space-xl);
+}
+
+.schedule-card-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+}
+
+/* --- Weekly Availability Grid --- */
+.schedule-grid {
+  margin-top: var(--space-lg);
+}
+
+.schedule-grid-header {
+  display: grid;
+  grid-template-columns: 100px repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.schedule-grid-corner {
+  /* empty corner cell in the grid */
+  display: block;
+}
+
+.schedule-day-label {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.schedule-grid-row {
+  display: grid;
+  grid-template-columns: 100px repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.schedule-block-label {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.schedule-cell {
+  aspect-ratio: 1;
+  max-height: 48px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: transparent;
+}
+
+.schedule-cell:hover {
+  border-color: var(--green-primary);
+  background: rgba(0, 230, 118, 0.05);
+}
+
+.schedule-cell.active {
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.2), rgba(0, 230, 118, 0.1));
+  border-color: var(--green-primary);
+  color: var(--green-primary);
+  box-shadow: 0 0 12px rgba(0, 230, 118, 0.15);
+}
+
+/* --- Schedule Form --- */
+.schedule-form-section {
+  margin-bottom: var(--space-lg);
+}
+
+.schedule-datetime {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.schedule-datetime .input-field {
+  width: 100%;
+  color-scheme: dark;
+}
+
+/* --- Favorite Driver Selector --- */
+.favorite-drivers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.favorite-driver-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+  color: var(--text-primary);
+}
+
+.favorite-driver-option:hover {
+  border-color: var(--gold-primary);
+  background: rgba(255, 215, 64, 0.05);
+}
+
+.favorite-driver-option.selected {
+  border-color: var(--green-primary);
+  background: rgba(0, 230, 118, 0.08);
+}
+
+.fav-driver-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.fav-driver-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.fav-driver-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.fav-driver-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* --- Fare Preview --- */
+.schedule-fare-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: rgba(0, 230, 118, 0.05);
+  border: 1px solid rgba(0, 230, 118, 0.15);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+  font-weight: 500;
+}
+
+/* --- Scheduled Ride Cards --- */
+.scheduled-ride-card {
+  padding: var(--space-lg);
+}
+
+.scheduled-ride-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+}
+
+.scheduled-ride-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.scheduled-ride-rider {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  margin-bottom: var(--space-sm);
+  font-weight: 500;
+}
+
+.scheduled-ride-route {
+  display: flex;
+  gap: var(--space-md);
+}
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+  .schedule-grid-header,
+  .schedule-grid-row {
+    grid-template-columns: 70px repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .schedule-block-label {
+    font-size: 0.65rem;
+  }
+
+  .schedule-day-label {
+    font-size: 0.65rem;
+  }
+
+  .schedule-cell {
+    max-height: 40px;
+  }
+
+  .schedule-datetime {
+    grid-template-columns: 1fr;
+  }
+}

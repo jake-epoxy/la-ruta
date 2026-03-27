@@ -1,16 +1,18 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  LayoutDashboard, DollarSign, CreditCard, MapPin, Clock, Navigation
+  LayoutDashboard, DollarSign, CreditCard, MapPin, Clock, Navigation, Calendar, ArrowLeftRight
 } from 'lucide-react';
 import './Sidebar.css';
 
 export default function Sidebar() {
-  const { user } = useAuth();
+  const { user, switchRole } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const driverLinks = [
     { to: '/driver', icon: LayoutDashboard, label: 'Dashboard', end: true },
+    { to: '/driver/schedule', icon: Calendar, label: 'Schedule' },
     { to: '/driver/earnings', icon: DollarSign, label: 'Earnings' },
     { to: '/driver/subscription', icon: CreditCard, label: 'Subscription' },
   ];
@@ -18,10 +20,21 @@ export default function Sidebar() {
   const riderLinks = [
     { to: '/rider', icon: MapPin, label: 'Request Ride', end: true },
     { to: '/rider/status', icon: Navigation, label: 'Ride Status' },
+    { to: '/rider/schedule', icon: Calendar, label: 'Schedule' },
     { to: '/rider/history', icon: Clock, label: 'Ride History' },
   ];
 
   const links = user?.role === 'driver' ? driverLinks : riderLinks;
+
+  const handleSwitchRole = async () => {
+    const newRole = user?.role === 'driver' ? 'rider' : 'driver';
+    const confirmed = window.confirm(
+      `Switch to ${newRole === 'driver' ? 'Driver' : 'Rider'} mode?`
+    );
+    if (!confirmed) return;
+    await switchRole();
+    navigate(newRole === 'driver' ? '/driver' : '/rider');
+  };
 
   return (
     <aside className="sidebar">
@@ -50,6 +63,11 @@ export default function Sidebar() {
             <span>{link.label}</span>
           </NavLink>
         ))}
+
+        <button className="sidebar-link sidebar-switch-btn" onClick={handleSwitchRole}>
+          <ArrowLeftRight size={18} />
+          <span>Switch to {user?.role === 'driver' ? 'Rider' : 'Driver'}</span>
+        </button>
       </nav>
 
       <div className="sidebar-footer">

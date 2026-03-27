@@ -104,6 +104,21 @@
   text-overflow: ellipsis;
 }
 
+/* Role Switch Button */
+.sidebar-switch-btn {
+  margin-top: auto !important;
+  border: 1px dashed rgba(255, 215, 64, 0.3) !important;
+  color: var(--gold-primary) !important;
+  cursor: pointer;
+  background: none;
+  width: 100%;
+}
+
+.sidebar-switch-btn:hover {
+  background: rgba(255, 215, 64, 0.08) !important;
+  border-color: var(--gold-primary) !important;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);

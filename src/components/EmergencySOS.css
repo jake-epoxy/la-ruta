@@ -1,0 +1,278 @@
+/* ===========================
+   Emergency SOS — Styles
+   =========================== */
+
+/* --- Floating SOS Button --- */
+.sos-fab {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  z-index: 999;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff1744, #d50000);
+  color: #fff;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255, 23, 68, 0.5);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sos-fab-label {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Pulse rings */
+.sos-pulse-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 23, 68, 0.5);
+  animation: sosPulse 2s ease-out infinite;
+  pointer-events: none;
+}
+
+.sos-pulse-ring-2 {
+  animation-delay: 1s;
+}
+
+@keyframes sosPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* --- Modal Overlay --- */
+.sos-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* --- Modal --- */
+.sos-modal {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-secondary, #111827);
+  border: 1px solid rgba(255, 23, 68, 0.3);
+  border-radius: var(--radius-lg, 16px);
+  padding: 28px 24px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 23, 68, 0.15);
+}
+
+.sos-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, rgba(255,255,255,0.7));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sos-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* --- Header --- */
+.sos-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.sos-header-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.sos-header h2 {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1.5rem;
+  color: #ff1744;
+  margin-bottom: 4px;
+}
+
+.sos-header p {
+  font-size: 0.9rem;
+  color: var(--text-secondary, rgba(255,255,255,0.7));
+}
+
+/* --- Action Buttons --- */
+.sos-action {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-md, 12px);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.sos-action strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.sos-action span {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Call 911 — big red button */
+.sos-action-911 {
+  background: linear-gradient(135deg, #ff1744, #d50000);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(255, 23, 68, 0.4);
+  font-size: 1rem;
+}
+
+.sos-action-911:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(255, 23, 68, 0.55);
+}
+
+/* Share location */
+.sos-action-share {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary, #fff);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sos-action-share:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- GPS Coordinates Card --- */
+.sos-coords {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 12px);
+  margin-bottom: 12px;
+  color: var(--text-secondary, rgba(255,255,255,0.7));
+}
+
+.sos-coords svg {
+  margin-top: 2px;
+  flex-shrink: 0;
+  color: var(--gold-primary, #ffd740);
+}
+
+.sos-coords-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sos-coords-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: var(--text-muted, rgba(255,255,255,0.4));
+}
+
+.sos-coords-value {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.95rem;
+  color: var(--text-primary, #fff);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.sos-coords-accuracy {
+  font-size: 0.75rem;
+  color: var(--green-primary, #00e676);
+}
+
+/* --- Google Maps Link --- */
+.sos-maps-link {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.85rem;
+  color: var(--gold-primary, #ffd740);
+  text-decoration: none;
+  border-radius: var(--radius-sm, 8px);
+  transition: background 0.2s ease;
+  margin-bottom: 16px;
+}
+
+.sos-maps-link:hover {
+  background: rgba(255, 215, 64, 0.08);
+}
+
+/* --- Disclaimer --- */
+.sos-disclaimer {
+  font-size: 0.75rem;
+  color: var(--text-muted, rgba(255,255,255,0.4));
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* --- Mobile adjustments --- */
+@media (max-width: 768px) {
+  .sos-fab {
+    bottom: 85px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .sos-modal {
+    max-width: 100%;
+    border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .sos-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+}

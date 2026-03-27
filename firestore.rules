@@ -47,5 +47,19 @@ service cloud.firestore {
       // Nobody should be deleting ride documents, only updating status to 'cancelled'
       allow delete: if isAdmin();
     }
+
+    match /scheduledRides/{rideId} {
+      // READS: All authenticated users can read (client-side filtering)
+      allow read: if isAuth();
+
+      // CREATES: Only riders can create scheduled rides (riderId must match)
+      allow create: if isAuth() && request.resource.data.riderId == request.auth.uid;
+
+      // UPDATES: Authenticated users can update (accept, decline, cancel)
+      allow update: if isAuth();
+
+      // DELETES: Admin only
+      allow delete: if isAdmin();
+    }
   }
 }

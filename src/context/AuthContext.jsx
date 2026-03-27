@@ -100,8 +100,25 @@ export function AuthProvider({ children }) {
     setUser(prev => ({ ...prev, ...updates }));
   };
 
+  const switchRole = async () => {
+    if (!user?.uid) return;
+    const newRole = user.role === 'driver' ? 'rider' : 'driver';
+    const updates = { role: newRole, isOnline: false, location: null };
+
+    // First time becoming a driver? Initialize trial/subscription fields
+    if (newRole === 'driver' && !user.trialEndsAt) {
+      updates.subscriptionStatus = 'trialing';
+      updates.trialEndsAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+      updates.rating = 4.9;
+      updates.driverPreferences = user.driverPreferences || [];
+    }
+
+    await updateDoc(doc(db, 'users', user.uid), updates);
+    setUser(prev => ({ ...prev, ...updates }));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, switchRole }}>
       {children}
     </AuthContext.Provider>
   );

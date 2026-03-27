@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, NavLink } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { RideProvider } from './context/RideContext';
 import { LocationProvider } from './context/LocationContext';
@@ -12,32 +12,43 @@ import Terms from './pages/Terms';
 import DriverDashboard from './pages/DriverDashboard';
 import DriverEarnings from './pages/DriverEarnings';
 import DriverSubscription from './pages/DriverSubscription';
+import DriverSchedule from './pages/DriverSchedule';
 import RiderHome from './pages/RiderHome';
 import RiderRideStatus from './pages/RiderRideStatus';
 import RiderHistory from './pages/RiderHistory';
+import RiderSchedule from './pages/RiderSchedule';
 import AdminDashboard from './pages/AdminDashboard';
 import {
-  LayoutDashboard, DollarSign, CreditCard, MapPin, Navigation, Clock
+  LayoutDashboard, DollarSign, CreditCard, MapPin, Navigation, Clock, Calendar, ArrowLeftRight
 } from 'lucide-react';
 import './App.css';
 
 function MobileBottomNav() {
-  const { user } = useAuth();
+  const { user, switchRole } = useAuth();
+  const navigate = useNavigate();
   if (!user) return null;
 
   const driverLinks = [
     { to: '/driver', icon: LayoutDashboard, label: 'Dashboard', end: true },
+    { to: '/driver/schedule', icon: Calendar, label: 'Schedule' },
     { to: '/driver/earnings', icon: DollarSign, label: 'Earnings' },
-    { to: '/driver/subscription', icon: CreditCard, label: 'Plan' },
   ];
 
   const riderLinks = [
     { to: '/rider', icon: MapPin, label: 'Ride', end: true },
     { to: '/rider/status', icon: Navigation, label: 'Status' },
-    { to: '/rider/history', icon: Clock, label: 'History' },
+    { to: '/rider/schedule', icon: Calendar, label: 'Schedule' },
   ];
 
   const links = user.role === 'driver' ? driverLinks : riderLinks;
+
+  const handleSwitch = async () => {
+    const newRole = user.role === 'driver' ? 'rider' : 'driver';
+    if (window.confirm(`Switch to ${newRole === 'driver' ? 'Driver' : 'Rider'} mode?`)) {
+      await switchRole();
+      navigate(newRole === 'driver' ? '/driver' : '/rider');
+    }
+  };
 
   return (
     <nav className="mobile-bottom-nav">
@@ -52,6 +63,10 @@ function MobileBottomNav() {
           <span>{link.label}</span>
         </NavLink>
       ))}
+      <button className="bottom-nav-item bottom-nav-switch" onClick={handleSwitch}>
+        <ArrowLeftRight size={20} />
+        <span>{user.role === 'driver' ? 'Rider' : 'Driver'}</span>
+      </button>
     </nav>
   );
 }
@@ -83,6 +98,9 @@ function AppLayout() {
             <Route path="/driver/subscription" element={
               <ProtectedRoute role="driver"><DriverSubscription /></ProtectedRoute>
             } />
+            <Route path="/driver/schedule" element={
+              <ProtectedRoute role="driver"><DriverSchedule /></ProtectedRoute>
+            } />
 
             <Route path="/rider" element={
               <ProtectedRoute role="rider"><RiderHome /></ProtectedRoute>
@@ -92,6 +110,9 @@ function AppLayout() {
             } />
             <Route path="/rider/history" element={
               <ProtectedRoute role="rider"><RiderHistory /></ProtectedRoute>
+            } />
+            <Route path="/rider/schedule" element={
+              <ProtectedRoute role="rider"><RiderSchedule /></ProtectedRoute>
             } />
 
             <Route path="/admin" element={
