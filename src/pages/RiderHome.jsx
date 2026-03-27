@@ -326,41 +326,6 @@ export default function RiderHome() {
         )}
         </AnimatePresence>
       </motion.div>
-
-      {/* Nearby Drivers */}
-      <motion.div
-        className="nearby-drivers glass-card"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <h3>Drivers Near You ({nearbyDrivers.length} online)</h3>
-        {nearbyDrivers.length > 0 ? (
-          <div className="drivers-list">
-            {nearbyDrivers.map(driver => (
-              <div key={driver.uid} className="driver-card">
-                <div className="driver-avatar">
-                  {driver.name?.charAt(0) || '?'}
-                </div>
-                <div className="driver-info">
-                  <span className="driver-name">{driver.name}</span>
-                  <span className="driver-car">La Ruta Driver</span>
-                </div>
-                <div className="driver-meta">
-                  <span className="driver-rating">⭐ {driver.rating || '4.9'}</span>
-                  <span className="driver-eta">
-                    <Clock size={12} /> Online
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: 'var(--space-xl)' }}>
-            No drivers online right now. Check back soon!
-          </p>
-        )}
-      </motion.div>
     </div>
   );
 }
