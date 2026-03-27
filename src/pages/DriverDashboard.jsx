@@ -27,6 +27,18 @@ export default function DriverDashboard() {
     }
   }, [isOnline]);
 
+  // Auto-offline when driver closes tab / navigates away
+  useEffect(() => {
+    if (!isOnline || !user?.uid) return;
+
+    const goOffline = () => {
+      updateUser({ isOnline: false, location: null }).catch(() => {});
+    };
+
+    window.addEventListener('beforeunload', goOffline);
+    return () => window.removeEventListener('beforeunload', goOffline);
+  }, [isOnline, user?.uid]);
+
   const trialEndsAt = user?.trialEndsAt ? new Date(user.trialEndsAt) : null;
   const now = new Date();
   const isTrialActive = trialEndsAt ? trialEndsAt > now : true; // assume active if no date set yet
