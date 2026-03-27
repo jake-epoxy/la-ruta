@@ -9,6 +9,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import DriverDashboard from './pages/DriverDashboard';
 import DriverEarnings from './pages/DriverEarnings';
 import DriverSubscription from './pages/DriverSubscription';
@@ -88,6 +89,7 @@ function AppLayout() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
 
             <Route path="/driver" element={
               <ProtectedRoute role="driver"><DriverDashboard /></ProtectedRoute>
