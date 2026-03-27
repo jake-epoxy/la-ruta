@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Home, Users, Car, AlertTriangle, CheckCircle, Activity, DollarSign } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Home, Users, Car, AlertTriangle, CheckCircle, Activity, DollarSign, Search } from 'lucide-react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 import { motion } from 'framer-motion';
@@ -8,7 +8,8 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [rides, setRides] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview'); // overview, drivers, rides
+  const [activeTab, setActiveTab] = useState('overview');
+  const [rideSearch, setRideSearch] = useState('');
 
   useEffect(() => {
     // Listen to all users
@@ -36,6 +37,26 @@ export default function AdminDashboard() {
   const completedRides = rides.filter(r => r.status === 'completed');
   
   const totalRevenue = completedRides.reduce((sum, r) => sum + (r.fare || 0), 0);
+
+  // Smart search — matches across all ride fields
+  const filteredRides = useMemo(() => {
+    if (!rideSearch.trim()) return rides;
+    const terms = rideSearch.toLowerCase().split(/\s+/).filter(Boolean);
+    return rides.filter(ride => {
+      const searchable = [
+        ride.riderName,
+        ride.driverName,
+        ride.pickup,
+        ride.dropoff,
+        ride.status?.replace(/_/g, ' '),
+        ride.tier,
+        ride.fare ? `$${ride.fare.toFixed(2)}` : '',
+        ride.createdAt?.seconds ? new Date(ride.createdAt.seconds * 1000).toLocaleDateString() : '',
+      ].filter(Boolean).join(' ').toLowerCase();
+
+      return terms.every(term => searchable.includes(term));
+    });
+  }, [rides, rideSearch]);
 
   const getTrialStatus = (driver) => {
     if (driver.subscriptionStatus === 'active') return <span className="badge badge-green">Premium</span>;
@@ -177,26 +198,60 @@ export default function AdminDashboard() {
 
       {activeTab === 'rides' && (
         <motion.div className="glass-card" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ padding: '1.5rem', overflowX: 'auto' }}>
-          <h3 style={{ marginBottom: '1.5rem' }}>Recent Rides (Last 50)</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <h3 style={{ margin: 0 }}>Ride Ledger</h3>
+            {/* Smart Search */}
+            <div style={{ position: 'relative', flex: '1', maxWidth: '400px', minWidth: '200px' }}>
+              <input
+                type="text"
+                placeholder="🔍 Search rides... (name, status, location, tier)"
+                value={rideSearch}
+                onChange={(e) => setRideSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 16px 10px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(255,255,255,0.05)',
+                  color: '#fff',
+                  fontSize: '0.85rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease',
+                }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--green-primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+              />
+              {rideSearch && (
+                <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  {filteredRides.length} result{filteredRides.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+          </div>
           <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-secondary)' }}>
                 <th style={{ padding: '1rem' }}>Date/Time</th>
                 <th style={{ padding: '1rem' }}>Rider</th>
                 <th style={{ padding: '1rem' }}>Driver</th>
+                <th style={{ padding: '1rem' }}>Route</th>
                 <th style={{ padding: '1rem' }}>Status</th>
                 <th style={{ padding: '1rem' }}>Fare</th>
                 <th style={{ padding: '1rem' }}>Tier</th>
               </tr>
             </thead>
             <tbody>
-              {rides.map(r => (
+              {filteredRides.map(r => (
                 <tr key={r.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                   <td style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                     {r.createdAt?.seconds ? new Date(r.createdAt.seconds * 1000).toLocaleString() : '-'}
                   </td>
                   <td style={{ padding: '1rem', fontWeight: 600 }}>{r.riderName || '-'}</td>
                   <td style={{ padding: '1rem' }}>{r.driverName || <span style={{color: 'var(--text-muted)'}}>Pending</span>}</td>
+                  <td style={{ padding: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)', maxWidth: '200px' }}>
+                    {r.pickup && <div>📍 {r.pickup}</div>}
+                    {r.dropoff && <div>🏁 {r.dropoff}</div>}
+                  </td>
                   <td style={{ padding: '1rem', color: getStatusColor(r.status), fontWeight: 600 }}>
                     {r.status.replace(/_/g, ' ').toUpperCase()}
                   </td>
@@ -204,9 +259,11 @@ export default function AdminDashboard() {
                   <td style={{ padding: '1rem' }}><span className="badge" style={{background: 'rgba(255,255,255,0.1)'}}>{r.tier || 'Standard'}</span></td>
                 </tr>
               ))}
-              {rides.length === 0 && (
+              {filteredRides.length === 0 && (
                 <tr>
-                  <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No rides requested yet.</td>
+                  <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                    {rideSearch ? `No rides matching "${rideSearch}"` : 'No rides requested yet.'}
+                  </td>
                 </tr>
               )}
             </tbody>
