@@ -103,7 +103,7 @@ export default function RiderHome() {
         { id: 'Priority', price: baseFareVal * 1.3, eta: getArrivalTimeStr(3), icon: '⚡', desc: 'Fastest pickup available' },
         { id: 'La Ruta XL', price: baseFareVal * 1.6, eta: getArrivalTimeStr(8), icon: '🚐', desc: 'Up to 6 people' },
         { id: 'Pets', price: baseFareVal + 4.00, eta: getArrivalTimeStr(7), icon: '🐾', desc: 'Bring your furry friend' },
-        ...(dist > 15 ? [{ id: 'Long Distance', price: baseFareVal * 2.2, eta: getArrivalTimeStr(10), icon: '🛣️', desc: 'Out of town / cross-state trips' }] : [])
+        ...(dist > 30 ? [{ id: 'Long Distance', price: baseFareVal * 2.2, eta: getArrivalTimeStr(10), icon: '🛣️', desc: 'Out of town / cross-state trips' }] : [])
       ]
     });
     setSelectedTier('Standard');
