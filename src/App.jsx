@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Terms from './pages/Terms';
 import DriverDashboard from './pages/DriverDashboard';
 import DriverEarnings from './pages/DriverEarnings';
 import DriverSubscription from './pages/DriverSubscription';
@@ -71,6 +72,7 @@ function AppLayout() {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/terms" element={<Terms />} />
 
             <Route path="/driver" element={
               <ProtectedRoute role="driver"><DriverDashboard /></ProtectedRoute>

@@ -16,6 +16,7 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [driverPreferences, setDriverPreferences] = useState([]);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -173,7 +174,20 @@ export default function Register() {
             </div>
           )}
 
-          <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: '8px' }} disabled={loading}>
+          <div className="input-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '12px', marginTop: '16px' }}>
+            <input 
+              type="checkbox" 
+              id="terms" 
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              style={{ marginTop: '4px', width: '18px', height: '18px', accentColor: 'var(--green-primary)' }}
+            />
+            <label htmlFor="terms" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+              I agree to the <Link to="/terms" target="_blank" style={{ color: 'var(--gold-primary)' }}>Terms of Service</Link> and acknowledge La Ruta is an Alpha software. I understand La Ruta is a SaaS platform connecting independent contractors, not a transportation company.
+            </label>
+          </div>
+
+          <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: '16px' }} disabled={loading || !acceptedTerms}>
             {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={16} />
           </button>
 
