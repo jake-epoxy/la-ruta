@@ -5,6 +5,7 @@ import { useLocation } from '../context/LocationContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import Map from '../components/Map';
 import AddressInput from '../components/AddressInput';
+import RiderCheckout from '../components/RiderCheckout';
 import { MapPin, Navigation, DollarSign, ArrowRight, Clock, Car, Search } from 'lucide-react';
 import './Dashboard.css';
 import './Rider.css';
@@ -20,6 +21,8 @@ export default function RiderHome() {
   const [fareEstimates, setFareEstimates] = useState(null);
   const [selectedTier, setSelectedTier] = useState('Standard');
   const [requesting, setRequesting] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutFare, setCheckoutFare] = useState(0);
 
   // Start tracking location on mount
   useEffect(() => {
@@ -107,10 +110,20 @@ export default function RiderHome() {
       ]
     });
     setSelectedTier('Standard');
+    setShowCheckout(false);
   };
 
-  const handleRequest = async () => {
+  const handleStartCheckout = () => {
     if (!pickup || !dropoff || !fareEstimates) return;
+    const selectedTierData = fareEstimates.tiers.find((t) => t.id === selectedTier);
+    const finalFare = selectedTierData ? parseFloat(selectedTierData.price.toFixed(2)) : 0;
+    
+    setCheckoutFare(finalFare);
+    setShowCheckout(true);
+  };
+
+  const handlePaymentSuccess = async (paymentIntentId) => {
+    setShowCheckout(false);
     setRequesting(true);
 
     const selectedTierData = fareEstimates.tiers.find(t => t.id === selectedTier);
@@ -149,7 +162,8 @@ export default function RiderHome() {
       dCoords, 
       finalFare, 
       selectedTier,
-      vibes
+      vibes,
+      paymentIntentId // Attach the Stripe Auth Hold ID!
     );
     setRequesting(false);
     navigate('/rider/status');
@@ -314,15 +328,30 @@ export default function RiderHome() {
               `}</style>
             </div>
 
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              className="btn btn-primary btn-lg"
-              onClick={handleRequest}
-              disabled={requesting}
-              style={{ width: '100%' }}
-            >
-              {requesting ? 'Requesting...' : `Request ${selectedTier}`} <ArrowRight size={16} />
-            </motion.button>
+            {/* Checkout Form OR Request Button */}
+            {showCheckout ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ marginTop: 'var(--space-md)' }}
+              >
+                <RiderCheckout 
+                  baseFare={checkoutFare} 
+                  onSuccess={handlePaymentSuccess} 
+                  onCancel={() => setShowCheckout(false)} 
+                />
+              </motion.div>
+            ) : (
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                className="btn btn-primary btn-lg"
+                onClick={handleStartCheckout}
+                disabled={requesting}
+                style={{ width: '100%' }}
+              >
+                {requesting ? 'Processing...' : `Request ${selectedTier}`} <ArrowRight size={16} />
+              </motion.button>
+            )}
           </motion.div>
         )}
         </AnimatePresence>

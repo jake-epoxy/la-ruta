@@ -220,7 +220,7 @@ export function RideProvider({ children }) {
   }, []);
 
   // Rider: Request a ride
-  const requestRide = useCallback(async (pickup, dropoff, pickupCoords, dropoffCoords, fareEstimate, tier = 'Standard', vibes = []) => {
+  const requestRide = useCallback(async (pickup, dropoff, pickupCoords, dropoffCoords, fareEstimate, tier = 'Standard', vibes = [], paymentIntentId = null) => {
     if (!user?.uid) return null;
 
     const rideData = {
@@ -238,6 +238,7 @@ export function RideProvider({ children }) {
       fare: fareEstimate,
       tier,
       vibes,
+      paymentIntentId, // The Stripe Auth Hold ID!
       targetDriverIds: user.favoriteDrivers?.length > 0 ? user.favoriteDrivers : null,
       targetTimeoutExpires: user.favoriteDrivers?.length > 0 ? Date.now() + 30000 : null,
       status: 'requested',
@@ -311,12 +312,42 @@ export function RideProvider({ children }) {
 
   // Update ride status
   const updateRideStatus = useCallback(async (rideId, status) => {
+    // If completing the ride, capture the payment first
+    if (status === 'completed' && activeRide?.paymentIntentId) {
+      if (!user?.stripeAccountId) {
+        alert("⚠️ You cannot complete this ride to receive funds because your bank is not connected! Return to the Dashboard and click 'Set up Bank Payouts'.");
+        return; // Halt completion until they connect
+      }
+      
+      try {
+        const res = await fetch('/api/capture-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paymentIntentId: activeRide.paymentIntentId,
+            driverStripeAccountId: user.stripeAccountId,
+            driverFareExpected: activeRide.fare,
+          })
+        });
+        const data = await res.json();
+        if (data.error) {
+          console.error("Payment Capture Error:", data.error);
+          alert(`Failed to capture payout: ${data.error}`);
+        } else {
+          console.log(`Successfully transferred $${activeRide.fare} to Driver Bank.`);
+        }
+      } catch (err) {
+        console.error("Network error on payment capture", err);
+        alert("Network error. Payout delayed.");
+      }
+    }
+
     const updates = { status };
     if (status === 'completed') {
       updates.completedAt = serverTimestamp();
     }
     await updateDoc(doc(db, 'rides', rideId), updates);
-  }, []);
+  }, [activeRide, user]);
 
   // Cancel a ride
   const cancelRide = useCallback(async (rideId, actor = 'rider') => {

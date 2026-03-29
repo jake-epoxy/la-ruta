@@ -19,6 +19,7 @@ export default function DriverDashboard() {
   const [manualAddress, setManualAddress] = useState('');
   const [settingManual, setSettingManual] = useState(false);
   const [queuedRideId, setQueuedRideId] = useState(null);
+  const [isSettingUpStripe, setIsSettingUpStripe] = useState(false);
 
   // Auto-start GPS if driver was already online (e.g. page refresh)
   useEffect(() => {
@@ -162,6 +163,28 @@ export default function DriverDashboard() {
     setAddressInput('');
   };
 
+  const handleSetupStripe = async () => {
+    setIsSettingUpStripe(true);
+    try {
+      const res = await fetch('/api/create-connect-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: user?.uid, email: user?.email })
+      });
+      const data = await res.json();
+      if (data.url && data.stripeAccountId) {
+        await updateUser({ stripeAccountId: data.stripeAccountId });
+        window.location.href = data.url; // Redirect to Stripe onboarding
+      } else {
+        alert(data.error || 'Failed to connect to Stripe.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Network error communicating with Stripe.');
+    }
+    setIsSettingUpStripe(false);
+  };
+
   return (
     <div className="dashboard-page">
       {/* Emergency SOS — visible during active rides */}
@@ -190,6 +213,38 @@ export default function DriverDashboard() {
           <div className={`toggle-dot ${isOnline ? 'active' : ''}`} />
         </button>
       </div>
+
+      {/* Stripe Connect Onboarding Banner */}
+      {!user?.stripeAccountId && profileComplete && (
+        <motion.div
+          className="glass-card"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            marginBottom: 'var(--space-xl)',
+            borderColor: '#635BFF', /* Stripe Purple */
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            background: 'rgba(99, 91, 255, 0.08)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: 'var(--space-sm)' }}>
+            <span style={{ fontSize: '1.3rem' }}>🏦</span>
+            <h3 style={{ margin: 0, color: '#635BFF' }}>Bank Payouts Not Configured</h3>
+          </div>
+          <p className="text-secondary" style={{ fontSize: '0.85rem', marginBottom: 'var(--space-md)' }}>
+            You must connect a bank account to receive 100% of your earnings. La Ruta uses Stripe Connect to securely transfer funds to you immediately after each ride.
+          </p>
+          <button 
+            className="btn" 
+            onClick={handleSetupStripe}
+            disabled={isSettingUpStripe}
+            style={{ backgroundColor: '#635BFF', color: 'white', border: 'none' }}
+          >
+            {isSettingUpStripe ? 'Connecting...' : 'Set up Bank Payouts'}
+          </button>
+        </motion.div>
+      )}
 
       {/* Profile Completeness Banner */}
       {!profileComplete && (
