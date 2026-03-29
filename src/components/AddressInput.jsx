@@ -45,20 +45,15 @@ export default function AddressInput({
 
     setLoading(true);
     try {
-      // Soft-bias results to a ~40-mile radius around the driver's GPS using Mapbox bbox
-      let bboxParam = '';
+      // Soft-bias results to the user's GPS without strictly blocking out-of-state results
+      let locationBiasParam = '';
       if (userPosition && userPosition.lat && userPosition.lng) {
-        const offset = 0.6; // Roughly ~40 miles
-        const minX = userPosition.lng - offset;
-        const minY = userPosition.lat - offset;
-        const maxX = userPosition.lng + offset;
-        const maxY = userPosition.lat + offset;
-        bboxParam = `&bbox=${minX},${minY},${maxX},${maxY}`;
+        locationBiasParam = `&proximity=${userPosition.lng},${userPosition.lat}`;
       }
 
       const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}&country=us&types=address,poi${bboxParam}`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}&country=us&types=address,poi${locationBiasParam}`
       );
       const data = await response.json();
 
