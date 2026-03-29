@@ -41,14 +41,28 @@ function CheckoutForm({ amountToDisplay, onPaymentSuccess, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ 
-      background: 'white', 
-      padding: '24px', 
-      borderRadius: '12px',
-      color: 'black' 
+      background: 'var(--surface-color, rgba(25, 25, 25, 0.6))', 
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      border: '1px solid rgba(255, 255, 255, 0.08)',
+      padding: '28px', 
+      borderRadius: '16px',
+      color: 'white',
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
     }}>
-      <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0, color: 'black' }}>Secure Checkout</h3>
-        <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'black' }}>
+      <div style={{ 
+        marginBottom: '24px', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        paddingBottom: '16px',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+      }}>
+        <div>
+          <h3 style={{ margin: 0, color: 'white', fontSize: '1.2rem', fontWeight: 600 }}>Confirm Payment</h3>
+          <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Secured by Stripe ✨</p>
+        </div>
+        <span style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--green-primary)' }}>
           ${amountToDisplay}
         </span>
       </div>
@@ -67,7 +81,7 @@ function CheckoutForm({ amountToDisplay, onPaymentSuccess, onCancel }) {
           className="btn btn-secondary" 
           onClick={onCancel}
           disabled={processing}
-          style={{ flex: 1, borderColor: '#ccc', color: '#555' }}
+          style={{ flex: 1, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'white' }}
         >
           Cancel
         </button>
@@ -75,13 +89,13 @@ function CheckoutForm({ amountToDisplay, onPaymentSuccess, onCancel }) {
           type="submit" 
           className="btn btn-primary" 
           disabled={!stripe || processing}
-          style={{ flex: 2, background: 'var(--green-primary)' }}
+          style={{ flex: 2, background: 'var(--green-primary)', color: 'black', fontWeight: 'bold', border: 'none' }}
         >
           {processing ? 'Processing...' : `Hold $${amountToDisplay}`}
         </button>
       </div>
-      <p style={{ fontSize: '0.75rem', color: '#888', textAlign: 'center', marginTop: '12px' }}>
-        You will not be charged until the ride is completed.
+      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '16px' }}>
+        Your card is only temporarily authorized. No funds are officially captured until your ride is completed.
       </p>
     </form>
   );
@@ -139,7 +153,24 @@ export default function RiderCheckout({ baseFare, onSuccess, onCancel }) {
   return (
     <div className="checkout-container">
       {clientSecret && (
-        <Elements options={{ clientSecret, appearance: { theme: 'stripe' } }} stripe={stripePromise}>
+        <Elements 
+          options={{ 
+            clientSecret, 
+            appearance: { 
+              theme: 'night',
+              variables: {
+                colorPrimary: '#00e676',
+                colorBackground: '#1a1a1a',
+                colorText: '#ffffff',
+                colorDanger: '#ff5252',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                spacingUnit: '4px',
+                borderRadius: '8px',
+              }
+            } 
+          }} 
+          stripe={stripePromise}
+        >
           <CheckoutForm 
             amountToDisplay={amountToDisplay} 
             onPaymentSuccess={(pid) => onSuccess(pid || paymentIntentId)} 
