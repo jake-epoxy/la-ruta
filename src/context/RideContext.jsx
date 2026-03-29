@@ -352,6 +352,15 @@ export function RideProvider({ children }) {
   // Cancel a ride
   const cancelRide = useCallback(async (rideId, actor = 'rider') => {
     try {
+      // Stripe Cancellation Override (Instantly free the rider's credit limit)
+      if (activeRide?.paymentIntentId) {
+        fetch('/api/cancel-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentIntentId: activeRide.paymentIntentId })
+        }).catch(e => console.error("Failed to ping Stripe cancel webhook:", e));
+      }
+
       // Optimistic UI: clear immediately to bypass network lag
       if (activeRide && activeRide.id === rideId) {
         setActiveRide(null);
