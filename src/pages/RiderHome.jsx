@@ -98,18 +98,28 @@ export default function RiderHome() {
       return `in ${pickupDelayMinutes} min • ${timeStr}`;
     };
 
-    setFareEstimates({
-      distance: dist,
-      tiers: [
+    // Generate appropriate tiers based on distance
+    let availableTiers = [];
+    if (dist > 30) {
+      availableTiers = [
+        { id: 'Long Distance', price: baseFareVal * 2.2, eta: getArrivalTimeStr(10), icon: '🛣️', desc: 'Out of town / Accounts for driver empty return' },
+        { id: 'Long Distance XL', price: baseFareVal * 2.8, eta: getArrivalTimeStr(15), icon: '🚐', desc: 'Large vehicle for out of town' }
+      ];
+    } else {
+      availableTiers = [
         { id: 'Wait & Save', price: baseFareVal * 0.85, eta: getArrivalTimeStr(18), icon: '⏳', desc: 'Longer wait, lower price' },
         { id: 'Standard', price: baseFareVal, eta: getArrivalTimeStr(6), icon: '🚗', desc: 'Affordable, everyday rides' },
         { id: 'Priority', price: baseFareVal * 1.3, eta: getArrivalTimeStr(3), icon: '⚡', desc: 'Fastest pickup available' },
         { id: 'La Ruta XL', price: baseFareVal * 1.6, eta: getArrivalTimeStr(8), icon: '🚐', desc: 'Up to 6 people' },
-        { id: 'Pets', price: baseFareVal + 4.00, eta: getArrivalTimeStr(7), icon: '🐾', desc: 'Bring your furry friend' },
-        ...(dist > 30 ? [{ id: 'Long Distance', price: baseFareVal * 2.2, eta: getArrivalTimeStr(10), icon: '🛣️', desc: 'Out of town / cross-state trips' }] : [])
-      ]
+        { id: 'Pets', price: baseFareVal + 4.00, eta: getArrivalTimeStr(7), icon: '🐾', desc: 'Bring your furry friend' }
+      ];
+    }
+
+    setFareEstimates({
+      distance: dist,
+      tiers: availableTiers
     });
-    setSelectedTier('Standard');
+    setSelectedTier(availableTiers.length > 2 ? 'Standard' : 'Long Distance');
     setShowCheckout(false);
   };
 
